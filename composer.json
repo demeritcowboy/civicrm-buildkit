@@ -12,14 +12,17 @@
     }
   },
   "config": {
+    "platform": {
+      "php": "5.6"
+    },
     "bin-dir": "bin"
   },
   "require": {
-    "php": ">=5.3.3",
+    "php": ">=5.6",
     "totten/php-symbol-diff": "dev-master#54f869ca68a3cd75f3386f8490870369733d2c23",
     "civicrm/upgrade-test": "dev-master#03e554787f378900f870a030cf2575d3cd49900f",
-    "drupal/coder": "dev-8.x-2.x-civi#303765f4dfea97530f0ceea0919eeb525cf0c3aa",
-    "civicrm/composer-downloads-plugin": "~2.1",
+    "drupal/coder": "dev-8.x-2.x-civi#b04829b2095b6351531050f3ad25448fe63f1ce9",
+    "civicrm/composer-downloads-plugin": "^3.0",
     "squizlabs/php_codesniffer": ">=2.7 <4.0"
   },
   "repositories": [
@@ -37,11 +40,11 @@
       "amp": {"version": "2020-06-12-e65089c8", "url": "https://download.civicrm.org/amp/amp.phar-{$version}", "path": "bin/amp", "type": "phar"},
       "box": {"version": "2.7.5", "url": "https://github.com/box-project/box2/releases/download/{$version}/box-{$version}.phar", "path": "bin/box", "type": "phar"},
       "civici": {"version": "2020-07-10-6a29419c", "url": "https://download.civicrm.org/civici/civici.phar-{$version}", "path": "bin/civici", "type": "phar"},
-      "civistrings": {"version": "2018-04-11-93987d92", "url": "https://download.civicrm.org/civistrings/civistrings.phar-{$version}", "path": "bin/civistrings", "type": "phar"},
-      "civix": {"version": "2020-07-10-be8052ce", "url": "https://download.civicrm.org/civix/civix.phar-{$version}", "path": "bin/civix", "type": "phar"},
+      "civistrings": {"version": "2020-10-22-9e260990", "url": "https://download.civicrm.org/civistrings/civistrings.phar-{$version}", "path": "bin/civistrings", "type": "phar"},
+      "civix": {"version": "2020-09-20-7c26d0f9", "url": "https://download.civicrm.org/civix/civix.phar-{$version}", "path": "bin/civix", "type": "phar"},
       "codecept-php5": {"version": "2.3.6", "url": "https://codeception.com/releases/{$version}/php54/codecept.phar", "path": "bin/_codecept-php5.phar", "type": "phar"},
       "codecept-php7": {"version": "2.3.6", "url": "https://codeception.com/releases/{$version}/codecept.phar", "path": "bin/_codecept-php7.phar", "type": "phar"},
-      "cv": {"version": "2020-08-04-1b794acf", "url": "https://download.civicrm.org/cv/cv.phar-{$version}", "path": "bin/cv", "type": "phar"},
+      "cv": {"version": "2020-10-24-f2a348a4", "url": "https://download.civicrm.org/cv/cv.phar-{$version}", "path": "bin/cv", "type": "phar"},
       "drush8": {"version": "8.4.0", "url": "https://github.com/drush-ops/drush/releases/download/{$version}/drush.phar", "path": "extern/drush8.phar", "type": "phar"},
       "drush-backdrop": {"version": "1.0.0", "url": "https://github.com/backdrop-contrib/drush/archive/{$version}.zip", "path": "extern/drush-lib/backdrop"},
       "git-scan": {"version": "2020-07-16-5f15f6f5", "url": "https://download.civicrm.org/git-scan/git-scan.phar-{$version}", "path": "bin/git-scan", "type": "phar"},
@@ -50,7 +53,7 @@
       "phpunit5": {"version": "5.x", "url": "https://phar.phpunit.de/phpunit-5.phar", "path": "extern/phpunit5/phpunit5.phar", "type": "phar"},
       "phpunit6": {"version": "6.x", "url": "https://phar.phpunit.de/phpunit-6.phar", "path": "extern/phpunit6/phpunit6.phar", "type": "phar"},
       "phpunit7": {"version": "7.5.15", "url": "https://phar.phpunit.de/phpunit-7.5.15.phar", "path": "extern/phpunit7/phpunit7.phar", "type": "phar"},
-      "pogo": {"version": "0.2.3", "url": "https://github.com/totten/pogo/releases/download/v{$version}/pogo-{$version}.phar", "path": "bin/pogo", "type": "phar"},
+      "pogo": {"version": "0.2.4", "url": "https://github.com/totten/pogo/releases/download/v{$version}/pogo-{$version}.phar", "path": "bin/pogo", "type": "phar"},
       "wp": {"version": "2.4.0", "url": "https://github.com/wp-cli/wp-cli/releases/download/v{$version}/wp-cli-{$version}.phar", "path": "bin/wp", "type": "phar"}
     }
   }

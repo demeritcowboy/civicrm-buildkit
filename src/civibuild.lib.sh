@@ -412,14 +412,14 @@ function amp_snapshot_create() {
     echo "[[Save CMS DB ($CMS_DB_NAME) to file ($CMS_SQL)]]"
     cvutil_assertvars amp_snapshot_create CMS_SQL CMS_DB_ARGS CMS_DB_NAME
     cvutil_makeparent "$CMS_SQL"
-    cvutil_php_nodbg amp sql:dump --root="$CMS_ROOT" -Ncms | gzip > "$CMS_SQL"
+    cvutil_php_nodbg amp sql:dump --root="$CMS_ROOT" --passthru="--no-tablespaces" -Ncms | gzip > "$CMS_SQL"
   fi
 
   if [ -z "$CIVI_SQL_SKIP" ]; then
     echo "[[Save Civi DB ($CIVI_DB_NAME) to file ($CIVI_SQL)]]"
     cvutil_assertvars amp_snapshot_create CIVI_SQL CIVI_DB_ARGS CIVI_DB_NAME
     cvutil_makeparent "$CIVI_SQL"
-    cvutil_php_nodbg amp sql:dump --root="$CMS_ROOT" -Ncivi | gzip > "$CIVI_SQL"
+    cvutil_php_nodbg amp sql:dump --root="$CMS_ROOT" --passthru="--no-tablespaces" -Ncivi | gzip > "$CIVI_SQL"
   fi
 }
 
@@ -568,23 +568,29 @@ function civicrm_download_composer_d8() {
   cvutil_assertvars civicrm_download_composer_d8 CIVI_VERSION
 
   composer config 'extra.enable-patching' true
+  ## Ensure that we compile all our js as necessary
+  composer config extra.compile-mode all
 
   local CIVI_VERSION_COMP=$(civicrm_composer_ver "$CIVI_VERSION")
   local EXTRA_COMPOSER=()
   local EXTRA_PATCH=()
 
   case "$CIVI_VERSION" in
-    5.21*) EXTRA_COMPOSER+=( "civicrm/civicrm-setup:0.4.0 as 0.2.99" ) ; EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ) ; EXTRA_PATCH+=( "https://github.com/civicrm/civicrm-core/pull/16328" ); ;;
-    5.22*) EXTRA_COMPOSER+=( "civicrm/civicrm-setup:0.4.0 as 0.2.99" ) ; EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ) ; EXTRA_PATCH+=( "https://github.com/civicrm/civicrm-core/pull/16413" ); ;;
-    5.23*) EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ); ;;
-    5.24*) echo "No extra patches required" ; ;;
-    5.25*) echo "No extra patches required" ; ;;
-    5.26*) echo "No extra patches required" ; ;;
+    5.21*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; EXTRA_COMPOSER+=( "civicrm/civicrm-setup:0.4.0 as 0.2.99" ) ; EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ) ; EXTRA_PATCH+=( "https://github.com/civicrm/civicrm-core/pull/16328" ); ;;
+    5.22*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; EXTRA_COMPOSER+=( "civicrm/civicrm-setup:0.4.0 as 0.2.99" ) ; EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ) ; EXTRA_PATCH+=( "https://github.com/civicrm/civicrm-core/pull/16413" ); ;;
+    5.23*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; EXTRA_COMPOSER+=( 'cache/integration-tests:dev-master#b97328797ab199f0ac933e39842a86ab732f21f9' ); ;;
+    5.24*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.25*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.26*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.27*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.28*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.29*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
+    5.30*) EXTRA_COMPOSER+=( 'civicrm/civicrm-asset-plugin:~1.1' ) ; ;;
     *) echo "No extra patches required" ; ;;
   esac
   EXTRA_COMPOSER+=( 'pear/pear_exception:1.0.1 as 1.0.0') ## weird conflict in drupal-composer/drupal-project
 
-  composer require civicrm/civicrm-asset-plugin:'~1.0.0' "${EXTRA_COMPOSER[@]}" civicrm/civicrm-{core,packages,drupal-8}:"$CIVI_VERSION_COMP" --prefer-source
+  composer require "${EXTRA_COMPOSER[@]}" civicrm/civicrm-{core,packages,drupal-8}:"$CIVI_VERSION_COMP" --prefer-source
   [ -n "$EXTRA_PATCH" ] && git scan am -N "${EXTRA_PATCH[@]}"
 
   local civicrm_version_php=$(find -name civicrm-version.php)
@@ -1025,7 +1031,9 @@ function backdrop_download() {
 
   # See: https://github.com/backdrop/backdrop/pull/3018
   pushd "$WEB_ROOT/web/core/includes/database/mysql"
-    patch database.inc < "$PRJDIR/app/drupal-patches/mysql8-drupal.patch"
+    if grep -q 'NO_AUTO_CREATE_USER' database.inc; then
+      patch database.inc < "$PRJDIR/app/drupal-patches/mysql8-drupal.patch"
+    fi
   popd
 }
 
@@ -1037,12 +1045,15 @@ function drupal_download() {
   drush8 -y dl drupal-${CMS_VERSION} --destination="$WEB_ROOT" --drupal-project-rename
   mv "$WEB_ROOT/drupal" "$WEB_ROOT/web"
 
-  if [ ${CMS_VERSION} == "7.x" ]; then
-    # See: https://www.drupal.org/project/drupal/issues/2978575
-    pushd "$WEB_ROOT/web/includes/database/mysql"
-      patch database.inc < "$PRJDIR/app/drupal-patches/mysql8-drupal.patch"
-    popd
-  fi
+  case $CMS_VERSION in
+    7*)
+     # See: https://www.drupal.org/project/drupal/issues/2978575
+     pushd "$WEB_ROOT/web/includes/database/mysql"
+       if ! grep -q 'escapeAlias' database.inc; then
+         patch database.inc < "$PRJDIR/app/drupal-patches/mysql8-drupal.patch"
+       fi
+     popd
+  esac
 }
 
 ###############################################################################

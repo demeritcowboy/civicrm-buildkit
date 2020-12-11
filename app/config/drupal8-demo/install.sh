@@ -43,6 +43,9 @@ pushd "${CMS_ROOT}/sites/${DRUPAL_SITE_DIR}" >> /dev/null
   civicrm_apply_demo_defaults
   cv ev 'return CRM_Utils_System::synchronizeUsers();'
 
+  ## Show errors on screen
+  drush8 -y config:set system.logging error_level verbose
+
   ## Setup theme
   #above# drush8 -y en garland
   export SITE_CONFIG_DIR
@@ -87,15 +90,19 @@ pushd "${CMS_ROOT}/sites/${DRUPAL_SITE_DIR}" >> /dev/null
   drush8 -y rap demoadmin 'gotv campaign contacts'
   drush8 -y rap demoadmin 'sign CiviCRM Petition'
 
+  # Move extensions into web accessible areas
+  mv $CIVI_CORE/tools/extensions/org.civicrm.angularprofiles files/civicrm/ext
+  mv $CIVI_CORE/tools/extensions/org.civicrm.contactlayout files/civicrm/ext
+  cv api extension.refresh
+
   ## Setup CiviVolunteer
   drush8 -y cvapi extension.install key=org.civicrm.angularprofiles debug=1
 
   drush8 -y cvapi extension.install key=org.civicrm.volunteer debug=1
-  drush8 -y cvapi extension.install key=exportui debug=1
   drush8 -y rap anonymous 'register to volunteer'
   drush8 -y rap authenticated 'register to volunteer'
 
-  cv en civirules civisualize cividiscount
+  cv en --ignore-missing civirules civisualize cividiscount org.civicrm.search org.civicrm.contactlayout
 
   ## Demo sites always disable email and often disable cron
   drush8 cvapi StatusPreference.create ignore_severity=critical name=checkOutboundMail

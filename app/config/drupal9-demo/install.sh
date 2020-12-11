@@ -37,11 +37,14 @@ pushd "${CMS_ROOT}/sites/${DRUPAL_SITE_DIR}" >> /dev/null
   ## make sure drush functions are loaded
   drush8 cc drush -y
 
-  ## Setup CiviCRM -- But not in 'clean' config!
+  ## Setup CiviCRM
   echo '{"enable_components":["CiviEvent","CiviContribute","CiviMember","CiviMail","CiviReport","CiviPledge","CiviCase","CiviCampaign"]}' \
     | drush8 cvapi setting.create --in=json
   civicrm_apply_demo_defaults
   cv ev 'return CRM_Utils_System::synchronizeUsers();'
+
+  ## Show errors on screen
+  drush8 -y config:set system.logging error_level verbose
 
   ## Setup demo user
   civicrm_apply_d8_perm_defaults
@@ -69,15 +72,19 @@ pushd "${CMS_ROOT}/sites/${DRUPAL_SITE_DIR}" >> /dev/null
 
   drush8 -y scr "$SITE_CONFIG_DIR/install-welcome.php"
 
+  # Move extensions into web accessible areas
+  mv $CIVI_CORE/tools/extensions/org.civicrm.angularprofiles files/civicrm/ext
+  mv $CIVI_CORE/tools/extensions/org.civicrm.contactlayout files/civicrm/ext
+  cv api extension.refresh
+
   ## Setup CiviVolunteer
   drush8 -y cvapi extension.install key=org.civicrm.angularprofiles debug=1
 
   drush8 -y cvapi extension.install key=org.civicrm.volunteer debug=1
-  drush8 -y cvapi extension.install key=exportui debug=1
   drush8 -y rap anonymous 'register to volunteer'
   drush8 -y rap authenticated 'register to volunteer'
 
-  cv en civirules civisualize cividiscount
+  cv en --ignore-missing civirules civisualize cividiscount org.civicrm.search org.civicrm.contactlayout
 
   ## Demo sites always disable email and often disable cron
   drush8 cvapi StatusPreference.create ignore_severity=critical name=checkOutboundMail

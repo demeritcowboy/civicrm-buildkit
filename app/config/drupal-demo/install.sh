@@ -110,14 +110,13 @@ EOPERM
   drush -y cvapi extension.install key=org.civicrm.angularprofiles debug=1
 
   drush -y cvapi extension.install key=org.civicrm.volunteer debug=1
-  drush -y cvapi extension.install key=exportui debug=1
   drush scr "$PRJDIR/src/drush/perm.php" <<EOPERM
     role 'anonymous user'
     role 'authenticated user'
     add 'register to volunteer'
 EOPERM
 
-  cv en civirules civisualize cividiscount
+  cv en --ignore-missing civirules civisualize cividiscount org.civicrm.search org.civicrm.contactlayout
 
   ## Demo sites always disable email and often disable cron
   drush cvapi StatusPreference.create ignore_severity=critical name=checkOutboundMail

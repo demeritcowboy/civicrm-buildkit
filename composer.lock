@@ -4,29 +4,29 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "fb30a1b26fcd54b68be5d869e99e76fd",
+    "content-hash": "ab622af66235a066c1c91c6cd8c8cf1f",
     "packages": [
         {
             "name": "civicrm/composer-downloads-plugin",
-            "version": "v2.1.1",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/composer-downloads-plugin.git",
-                "reference": "8722bc7d547315be39397a3078bb51ee053ca269"
+                "reference": "3aabb6d259a86158d01829fc2c62a2afb9618877"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/8722bc7d547315be39397a3078bb51ee053ca269",
-                "reference": "8722bc7d547315be39397a3078bb51ee053ca269",
+                "url": "https://api.github.com/repos/civicrm/composer-downloads-plugin/zipball/3aabb6d259a86158d01829fc2c62a2afb9618877",
+                "reference": "3aabb6d259a86158d01829fc2c62a2afb9618877",
                 "shasum": ""
             },
             "require": {
-                "composer-plugin-api": "^1.1",
+                "composer-plugin-api": "^1.1 || ^2.0",
                 "php": ">=5.6",
                 "togos/gitignore": "~1.1.1"
             },
             "require-dev": {
-                "composer/composer": "~1.0",
+                "composer/composer": "~1.0 || ~2.0",
                 "friendsofphp/php-cs-fixer": "^2.3",
                 "phpunit/phpunit": "^5.7",
                 "totten/process-helper": "^1.0.1"
@@ -55,7 +55,7 @@
                 }
             ],
             "description": "Composer plugin for downloading additional files within any composer package.",
-            "time": "2019-08-28T00:33:51+00:00"
+            "time": "2020-11-02T04:00:42+00:00"
         },
         {
             "name": "civicrm/upgrade-test",
@@ -156,7 +156,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/civicrm/coder.git",
-                "reference": "303765f4dfea97530f0ceea0919eeb525cf0c3aa"
+                "reference": "b04829b2095b6351531050f3ad25448fe63f1ce9"
             },
             "require": {
                 "ext-mbstring": "*",
@@ -188,7 +188,7 @@
                 "issues": "https://www.drupal.org/project/issues/coder",
                 "source": "https://www.drupal.org/project/coder"
             },
-            "time": "2020-01-28T18:14:19+00:00"
+            "time": "2020-11-14T00:08:25+00:00"
         },
         {
             "name": "mustache/mustache",
@@ -711,7 +711,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "backendtea@gmail.com"
+                    "email": "BackEndTea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
@@ -974,8 +974,11 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.3.3"
+        "php": ">=5.6"
     },
     "platform-dev": [],
+    "platform-overrides": {
+        "php": "5.6"
+    },
     "plugin-api-version": "1.1.0"
 }

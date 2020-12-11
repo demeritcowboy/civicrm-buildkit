@@ -87,15 +87,47 @@ function task_phpunit() {
 function task_phpunit_core_extension() {
 
  EXTENSION="$1"
+ if [ ! -z "$2" ]; then
+   FILENAME="junit-$2.xml"
+ else
+   FILENAME="junit-$EXTENSION.xml"
+ fi
+ if [ -z "$3" ]; then
+   GROUP=""
+ else
+   GROUP="--group $3"
+ fi
 
  pushd "$CIVI_CORE/ext/$EXTENSION"
- if ! $GUARD phpunit6 --printer='Civi\Test\TAP' --log-junit="$JUNITDIR/junit-$EXTENSION.xml" ; then
+ if ! $GUARD phpunit6 --printer='Civi\Test\TAP' --log-junit="$JUNITDIR/$FILENAME" $GROUP; then
    EXITCODES="$EXITCODES $EXTENSION"
  fi
  echo "Found EXITCODES=\"$EXITCODES\""
 
  $GUARD phpunit-xml-cleanup "$JUNITDIR"/*.xml
 
+}
+
+function test_core_extenions() {
+  for DIR in $CIVI_CORE/ext/*/
+  do
+    if [ "$(basename $DIR)" = "afform" ]; then
+      test_afform_extensions $DIR
+    elif [ -f "$DIR/phpunit.xml.dist" ]; then
+      task_phpunit_core_extension "$(basename $DIR)"
+      $GUARD civibuild restore "$BLDNAME"
+    fi
+  done
+}
+
+function test_afform_extensions() {
+  DIR="$1"
+  task_phpunit_core_extension "$(basename $DIR)/core" "afform-core"
+  $GUARD civibuild restore "$BLDNAME"
+  cv en afform
+  task_phpunit_core_extension "$(basename $DIR)/mock" "afform-mock-e2e" e2e
+  task_phpunit_core_extension "$(basename $DIR)/mock" "afform-mock-headless" headless
+  $GUARD civibuild restore "$BLDNAME"
 }
 
 function task_karma() {
@@ -257,12 +289,8 @@ if [ "$SUITES" = "all" ]; then
       SUITES="$SUITES phpunit-api4"
     fi
 
-    if [ -e "ext/sequentialcreditnotes" ]; then
-      SUITES="$SUITES phpunit-creditnotes"
-    fi
-
-    if [ -e "ext/flexmailer" ]; then
-      SUITES="$SUITES phpunit-flexmailer"
+    if [ -d "ext" ]; then
+      SUITES="$SUITES phpunit-core-exts"
     fi
 
   popd >> /dev/null
@@ -298,6 +326,10 @@ for TESTTYPE in $SUITES ; do
     phpunit-backdrop) task_phpunit_backdrop ;;
     phpunit-creditnotes) task_phpunit_core_extension sequentialcreditnotes ;;
     phpunit-flexmailer) task_phpunit_core_extension flexmailer ;;
+    phpunit-financialacls) task_phpunit_core_extension financialacls ;;
+    phpunit-eway) task_phpunit_core_extension ewaysingle ;;
+    phpunit-afform) test_afform_extensions "$CIVI_CORE/ext/afform" ;;
+    phpunit-core-exts) test_core_extenions ;;
     *) echo "unrecognized suite: $TESTTYPE"; exit 2 ;;
   esac
 done
